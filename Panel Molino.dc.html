@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="_ds/modernist-f91f7469-8733-434d-9595-5909c56c2c60/styles.css">
+<script src="_ds/modernist-f91f7469-8733-434d-9595-5909c56c2c60/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--color-bg); font-family: var(--font-body); color: var(--color-text); }
+  a { color: var(--color-accent-700); text-decoration: none; }
+  a:hover { color: var(--color-accent); }
+  @keyframes molRow { from { transform: translateY(14px); } to { transform: translateY(0); } }
+  @keyframes molPanel { from { transform: translateY(10px); } to { transform: translateY(0); } }
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:var(--color-bg);">
+  <!-- topbar -->
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:24px;padding:18px 40px;border-bottom:2px solid var(--color-divider);background:var(--color-bg);">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:26px;height:26px;background:var(--color-accent);"></div>
+      <div>
+        <p style="font-family:var(--font-heading);font-weight:800;font-size:20px;letter-spacing:-.01em;line-height:1;margin:0;">MOLINO</p>
+        <p style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent);margin:3px 0 0;">Panel de gestión</p>
+      </div>
+    </div>
+    <a href="schema.sql" download style="display:inline-flex;align-items:center;gap:8px;font-family:var(--font-heading);font-weight:700;font-size:13px;color:var(--color-text);border:2px solid var(--color-divider);padding:8px 13px;" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent);">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+      molino.sqlite
+    </a>
+  </header>
+
+  <!-- tabs -->
+  <nav style="display:flex;gap:0;padding:0 40px;border-bottom:2px solid var(--color-divider);background:var(--color-bg);">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+      <button type="button" onClick="{{ t.onClick }}" style="display:inline-flex;align-items:center;gap:8px;padding:16px 20px;font-family:var(--font-heading);font-weight:700;font-size:14px;background:transparent;border:0;border-bottom:3px solid {{ t.border }};color:{{ t.color }};cursor:pointer;margin-bottom:-2px;" style-hover="color:var(--color-text);">
+        <span>{{ t.label }}</span>
+        <sc-if value="{{ t.badge }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;background:var(--color-accent);color:var(--color-bg);font-size:12px;font-weight:800;">{{ t.badge }}</span></sc-if>
+      </button>
+    </sc-for>
+  </nav>
+
+  <main style="padding:32px 40px 56px;">
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+    <div style="animation:molPanel .35s cubic-bezier(.2,.7,.2,1) both;">
+      <!-- KPI row -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--color-divider);border:2px solid var(--color-divider);margin-bottom:32px;">
+        <div style="background:var(--color-bg);padding:24px;">
+          <p style="font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent);margin:0 0 14px;">Productos activos</p>
+          <p style="font-family:var(--font-heading);font-weight:800;font-size:44px;line-height:1;letter-spacing:-.02em;margin:0;font-variant-numeric:tabular-nums;" data-count="{{ kpiProductos }}">{{ kpiProductos }}</p>
+        </div>
+        <div style="background:var(--color-bg);padding:24px;">
+          <p style="font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent);margin:0 0 14px;">Alertas de stock</p>
+          <p style="font-family:var(--font-heading);font-weight:800;font-size:44px;line-height:1;letter-spacing:-.02em;margin:0;color:var(--color-accent);font-variant-numeric:tabular-nums;" data-count="{{ kpiStockBajo }}">{{ kpiStockBajo }}</p>
+        </div>
+        <div style="background:var(--color-bg);padding:24px;">
+          <p style="font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent);margin:0 0 14px;">Clientes</p>
+          <p style="font-family:var(--font-heading);font-weight:800;font-size:44px;line-height:1;letter-spacing:-.02em;margin:0;font-variant-numeric:tabular-nums;" data-count="{{ kpiClientes }}">{{ kpiClientes }}</p>
+        </div>
+        <div style="background:var(--color-bg);padding:24px;">
+          <p style="font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent);margin:0 0 14px;">Valor inventario</p>
+          <p style="font-family:var(--font-heading);font-weight:800;font-size:44px;line-height:1;letter-spacing:-.02em;margin:0;font-variant-numeric:tabular-nums;" data-count="{{ kpiValor }}" data-prefix="$">{{ kpiValorLabel }}</p>
+          <p style="margin:10px 0 0;font-size:12px;color:color-mix(in srgb,var(--color-text) 50%,transparent);">valorizado a costo</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:32px;">
+        <!-- category distribution -->
+        <section>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid var(--color-divider);padding-bottom:12px;margin-bottom:18px;">
+            <h3 style="font-family:var(--font-heading);font-weight:800;font-size:18px;letter-spacing:-.01em;margin:0;">Inventario por categoría</h3>
+            <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 50%,transparent);">valor a costo</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:20px;">
+            <sc-for list="{{ catDist }}" as="c" hint-placeholder-count="3">
+              <div>
+                <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;">
+                  <span style="font-family:var(--font-heading);font-weight:700;font-size:14px;">{{ c.nombre }} <span style="color:color-mix(in srgb,var(--color-text) 45%,transparent);font-weight:400;">· {{ c.num }} productos</span></span>
+                  <span style="font-family:var(--font-heading);font-weight:800;font-size:15px;font-variant-numeric:tabular-nums;">{{ c.valorLabel }}</span>
+                </div>
+                <div style="height:14px;background:var(--color-surface);border:1px solid var(--color-divider);">
+                  <div style="height:100%;background:var(--color-accent);width:{{ c.pct }};"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid var(--color-divider);padding-bottom:12px;margin:36px 0 18px;">
+            <h3 style="font-family:var(--font-heading);font-weight:800;font-size:18px;letter-spacing:-.01em;margin:0;">Requieren reposición</h3>
+            <span class="tag tag-accent">{{ kpiStockBajo }} productos</span>
+          </div>
+          <div style="border-top:2px solid var(--color-divider);">
+            <sc-for list="{{ stockBajo }}" as="s" hint-placeholder-count="3">
+              <div data-reveal style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);animation:molRow .45s cubic-bezier(.2,.7,.2,1) both;animation-delay: {{ s.delay }};">
+                <span style="font-family:var(--font-heading);font-weight:700;font-size:12px;color:color-mix(in srgb,var(--color-text) 50%,transparent);width:70px;font-variant-numeric:tabular-nums;">{{ s.sku }}</span>
+                <span style="flex:1;font-family:var(--font-heading);font-weight:700;font-size:15px;">{{ s.nombre }}</span>
+                <span style="font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent);font-variant-numeric:tabular-nums;">{{ s.stock }} / {{ s.min }} mín</span>
+                <span class="tag tag-accent" style="font-variant-numeric:tabular-nums;">Faltan {{ s.faltan }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <!-- top clientes -->
+        <section>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid var(--color-divider);padding-bottom:12px;margin-bottom:6px;">
+            <h3 style="font-family:var(--font-heading);font-weight:800;font-size:18px;letter-spacing:-.01em;margin:0;">Mejores clientes</h3>
+            <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 50%,transparent);">total compras</span>
+          </div>
+          <sc-for list="{{ topClientes }}" as="c" hint-placeholder-count="5">
+            <div data-reveal style="display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--color-divider);animation:molRow .45s cubic-bezier(.2,.7,.2,1) both;animation-delay: {{ c.delay }};">
+              <span style="font-family:var(--font-heading);font-weight:800;font-size:16px;color:var(--color-accent);width:24px;font-variant-numeric:tabular-nums;">{{ c.rank }}</span>
+              <div style="flex:1;min-width:0;">
+                <p style="font-family:var(--font-heading);font-weight:700;font-size:15px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.nombre }}</p>
+                <p style="margin:2px 0 0;font-size:12px;color:color-mix(in srgb,var(--color-text) 50%,transparent);">{{ c.tipo }} · {{ c.comuna }}</p>
+              </div>
+              <span style="font-family:var(--font-heading);font-weight:800;font-size:15px;font-variant-numeric:tabular-nums;">{{ c.totalLabel }}</span>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===================== INVENTARIO ===================== -->
+    <sc-if value="{{ isInv }}" hint-placeholder-val="{{ false }}">
+    <div style="animation:molPanel .35s cubic-bezier(.2,.7,.2,1) both;">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:20px;">
+        <div>
+          <h3 style="font-family:var(--font-heading);font-weight:800;font-size:26px;letter-spacing:-.02em;margin:0;">Inventario</h3>
+          <p style="margin:4px 0 0;font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent);">{{ kpiProductos }} productos · {{ kpiStockBajo }} bajo mínimo</p>
+        </div>
+        <button type="button" class="btn btn-primary" style="gap:7px;padding:11px 16px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><path d="M12 5v14M5 12h14"/></svg>
+          Nuevo producto
+        </button>
+      </div>
+      <div style="border:2px solid var(--color-divider);">
+        <div style="display:grid;grid-template-columns:100px 1.6fr 1fr 110px 90px 90px 130px;gap:16px;padding:13px 20px;background:var(--color-surface);border-bottom:2px solid var(--color-divider);font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:color-mix(in srgb,var(--color-text) 60%,transparent);">
+          <span>SKU</span><span>Producto</span><span>Categoría</span><span style="text-align:right;">Precio</span><span style="text-align:right;">Stock</span><span style="text-align:right;">Mín</span><span style="text-align:right;">Estado</span>
+        </div>
+        <sc-for list="{{ inventario }}" as="p" hint-placeholder-count="11">
+          <div data-reveal style="display:grid;grid-template-columns:100px 1.6fr 1fr 110px 90px 90px 130px;gap:16px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--color-divider);animation:molRow .4s cubic-bezier(.2,.7,.2,1) both;animation-delay: {{ p.delay }};" style-hover="background:color-mix(in srgb,var(--color-text) 4%,transparent);">
+            <span style="font-family:var(--font-heading);font-weight:700;font-size:12px;color:color-mix(in srgb,var(--color-text) 55%,transparent);font-variant-numeric:tabular-nums;">{{ p.sku }}</span>
+            <span style="font-family:var(--font-heading);font-weight:700;font-size:15px;">{{ p.nombre }} <span style="color:color-mix(in srgb,var(--color-text) 45%,transparent);font-weight:400;font-size:13px;">· {{ p.unidad }}</span></span>
+            <span><span class="tag tag-neutral">{{ p.categoria }}</span></span>
+            <span style="text-align:right;font-family:var(--font-heading);font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;">{{ p.precioLabel }}</span>
+            <span style="text-align:right;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;color:{{ p.stockColor }};">{{ p.stock }}</span>
+            <span style="text-align:right;font-size:14px;color:color-mix(in srgb,var(--color-text) 50%,transparent);font-variant-numeric:tabular-nums;">{{ p.min }}</span>
+            <span style="text-align:right;"><span class="tag {{ p.estadoClass }}">{{ p.estado }}</span></span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===================== CLIENTES ===================== -->
+    <sc-if value="{{ isCli }}" hint-placeholder-val="{{ false }}">
+    <div style="animation:molPanel .35s cubic-bezier(.2,.7,.2,1) both;">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:20px;">
+        <div>
+          <h3 style="font-family:var(--font-heading);font-weight:800;font-size:26px;letter-spacing:-.02em;margin:0;">Clientes</h3>
+          <p style="margin:4px 0 0;font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent);">{{ kpiClientes }} registrados</p>
+        </div>
+        <button type="button" class="btn btn-primary" style="gap:7px;padding:11px 16px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><path d="M12 5v14M5 12h14"/></svg>
+          Nuevo cliente
+        </button>
+      </div>
+      <div style="border:2px solid var(--color-divider);">
+        <div style="display:grid;grid-template-columns:1.4fr 110px 130px 1.2fr 1fr 150px;gap:16px;padding:13px 20px;background:var(--color-surface);border-bottom:2px solid var(--color-divider);font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:color-mix(in srgb,var(--color-text) 60%,transparent);">
+          <span>Cliente</span><span>Tipo</span><span>RUT</span><span>Contacto</span><span>Comuna</span><span style="text-align:right;">Total compras</span>
+        </div>
+        <sc-for list="{{ clientes }}" as="c" hint-placeholder-count="6">
+          <div data-reveal style="display:grid;grid-template-columns:1.4fr 110px 130px 1.2fr 1fr 150px;gap:16px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--color-divider);animation:molRow .4s cubic-bezier(.2,.7,.2,1) both;animation-delay: {{ c.delay }};" style-hover="background:color-mix(in srgb,var(--color-text) 4%,transparent);">
+            <span style="font-family:var(--font-heading);font-weight:700;font-size:15px;">{{ c.nombre }}</span>
+            <span><span class="tag {{ c.tipoClass }}">{{ c.tipo }}</span></span>
+            <span style="font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent);font-variant-numeric:tabular-nums;">{{ c.rut }}</span>
+            <span style="font-size:13px;color:color-mix(in srgb,var(--color-text) 65%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.email }}</span>
+            <span style="font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent);">{{ c.comuna }}</span>
+            <span style="text-align:right;font-family:var(--font-heading);font-weight:800;font-size:15px;font-variant-numeric:tabular-nums;">{{ c.totalLabel }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'dashboard' };
+  }
+
+  clp(n) { return '$' + Math.round(n).toLocaleString('es-CL'); }
+
+  get productos() {
+    return [
+      { sku: 'PAN-001', nombre: 'Marraqueta', categoria: 'Pan', unidad: '1 kg', precio: 1890, costo: 1100, stock: 48, min: 30 },
+      { sku: 'PAN-002', nombre: 'Hallulla', categoria: 'Pan', unidad: '1 kg', precio: 1790, costo: 1050, stock: 22, min: 30 },
+      { sku: 'PAN-003', nombre: 'Pan de masa madre', categoria: 'Pan', unidad: '700 g', precio: 3990, costo: 2400, stock: 15, min: 12 },
+      { sku: 'PAN-004', nombre: 'Baguette artesanal', categoria: 'Pan', unidad: 'unidad', precio: 1290, costo: 700, stock: 60, min: 20 },
+      { sku: 'PAN-005', nombre: 'Ciabatta', categoria: 'Pan', unidad: 'unidad', precio: 2190, costo: 1200, stock: 27, min: 20 },
+      { sku: 'DUL-001', nombre: 'Croissant de mantequilla', categoria: 'Dulce', unidad: 'unidad', precio: 1190, costo: 620, stock: 8, min: 15 },
+      { sku: 'DUL-002', nombre: 'Berlín con crema', categoria: 'Dulce', unidad: 'unidad', precio: 1390, costo: 720, stock: 34, min: 15 },
+      { sku: 'BEB-001', nombre: 'Jugo de naranja', categoria: 'Bebidas', unidad: '1 L', precio: 2290, costo: 1400, stock: 40, min: 24 },
+      { sku: 'BEB-002', nombre: 'Café latte frío', categoria: 'Bebidas', unidad: '350 ml', precio: 2490, costo: 1500, stock: 12, min: 18 },
+      { sku: 'BEB-003', nombre: 'Agua mineral', categoria: 'Bebidas', unidad: '1.5 L', precio: 990, costo: 500, stock: 120, min: 40 },
+      { sku: 'BEB-004', nombre: 'Bebida cola', categoria: 'Bebidas', unidad: '1.5 L', precio: 1590, costo: 900, stock: 55, min: 30 },
+    ];
+  }
+
+  get clientesData() {
+    return [
+      { nombre: 'Panadería Central Ltda', tipo: 'Empresa', rut: '76.482.113-9', email: 'compras@central.cl', comuna: 'Santiago Centro', total: 278400 },
+      { nombre: 'Almacén Doña Rosa', tipo: 'Empresa', rut: '77.019.884-2', email: 'donarosa@gmail.com', comuna: 'Ñuñoa', total: 128100 },
+      { nombre: 'Café Vereda', tipo: 'Empresa', rut: '78.221.550-K', email: 'hola@cafevereda.cl', comuna: 'Providencia', total: 61180 },
+      { nombre: 'Minimarket El Sol', tipo: 'Empresa', rut: '76.998.201-4', email: 'elsol@minimarket.cl', comuna: 'Maipú', total: 80550 },
+      { nombre: 'Juan Pérez', tipo: 'Persona', rut: '12.345.678-5', email: 'juanp@correo.cl', comuna: 'La Florida', total: 18300 },
+      { nombre: 'Catalina Rojas', tipo: 'Persona', rut: '16.789.012-3', email: 'crojas@correo.cl', comuna: 'Las Condes', total: 24870 },
+    ];
+  }
+
+  setTab(t) { this.setState({ tab: t }); }
+
+  componentDidMount() { this.animateCounters(); }
+  componentDidUpdate(pp, ps) { if (ps.tab !== this.state.tab && this.state.tab === 'dashboard') { this._counted = false; this.animateCounters(); } }
+
+  animateCounters() {
+    if (this._counted) return; this._counted = true;
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const target = +el.dataset.count, dur = 1200, t0 = performance.now();
+      const pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
+      const step = t => {
+        const p = Math.min(1, (t - t0) / dur);
+        const e = 1 - Math.pow(1 - p, 3);
+        el.textContent = pre + Math.round(target * e).toLocaleString('es-CL') + suf;
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
+  renderVals() {
+    const P = this.productos;
+    const bajo = P.filter(p => p.stock < p.min);
+    const valorInv = P.reduce((n, p) => n + p.stock * p.costo, 0);
+
+    const cats = ['Pan', 'Bebidas', 'Dulce'];
+    const catStats = cats.map(name => {
+      const items = P.filter(p => p.categoria === name);
+      return { nombre: name, num: items.length, valor: items.reduce((n, p) => n + p.stock * p.costo, 0) };
+    });
+    const maxCat = Math.max(...catStats.map(c => c.valor), 1);
+    const catDist = catStats.map(c => ({ ...c, valorLabel: this.clp(c.valor), pct: Math.round((c.valor / maxCat) * 100) + '%' }));
+
+    const stockBajo = bajo.map((s, i) => ({ sku: s.sku, nombre: s.nombre, stock: s.stock, min: s.min, faltan: s.min - s.stock, delay: (i * 60) + 'ms' }));
+
+    const cli = [...this.clientesData].sort((a, b) => b.total - a.total);
+    const topClientes = cli.slice(0, 5).map((c, i) => ({ rank: i + 1, nombre: c.nombre, tipo: c.tipo, comuna: c.comuna, totalLabel: this.clp(c.total), delay: (i * 55) + 'ms' }));
+
+    const estadoOf = p => p.stock === 0 ? { estado: 'Agotado', estadoClass: 'tag-accent', stockColor: 'var(--color-accent)' }
+      : p.stock < p.min ? { estado: 'Stock bajo', estadoClass: 'tag-accent', stockColor: 'var(--color-accent)' }
+      : { estado: 'OK', estadoClass: 'tag-neutral', stockColor: 'var(--color-text)' };
+    const inventario = P.map((p, i) => ({ ...p, precioLabel: this.clp(p.precio), delay: (i * 40) + 'ms', ...estadoOf(p) }));
+
+    const clientes = cli.map((c, i) => ({ ...c, totalLabel: this.clp(c.total), tipoClass: c.tipo === 'Empresa' ? 'tag-neutral' : 'tag-outline', delay: (i * 45) + 'ms' }));
+
+    const tab = this.state.tab;
+    const tabs = [
+      { key: 'dashboard', label: 'Dashboard', badge: 0 },
+      { key: 'inventario', label: 'Inventario', badge: bajo.length },
+      { key: 'clientes', label: 'Clientes', badge: 0 },
+    ].map(t => ({
+      label: t.label, badge: t.badge,
+      onClick: () => this.setTab(t.key),
+      color: tab === t.key ? 'var(--color-text)' : 'color-mix(in srgb, var(--color-text) 50%, transparent)',
+      border: tab === t.key ? 'var(--color-accent)' : 'transparent',
+    }));
+
+    return {
+      tabs, isDash: tab === 'dashboard', isInv: tab === 'inventario', isCli: tab === 'clientes',
+      kpiProductos: P.length, kpiStockBajo: bajo.length, kpiClientes: this.clientesData.length,
+      kpiValor: valorInv, kpiValorLabel: this.clp(valorInv),
+      catDist, stockBajo, topClientes, inventario, clientes,
+    };
+  }
+}
+</script>
+</body>
+</html>
